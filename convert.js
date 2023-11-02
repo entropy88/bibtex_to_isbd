@@ -7,7 +7,7 @@ var output = document.getElementById("output");
 The first will get where you put your file, in this case it's the input element.
 The second will get the div which content will be replaced by the content of your txt file. */
 let exportContent = document.getElementById("exportContent");
-let query=document.getElementById('query');
+let query = document.getElementById('query');
 
 /* Here we tell to our input element to do something special when his value changes.
 A change will occur for example when a user will chose a file.*/
@@ -30,8 +30,8 @@ input.addEventListener("change", function () {
     reader.readAsText(myFile);
   }
   //add query
-  let queryP=document.createElement('p');
-  queryP.textContent=`Тема на справката: ${query.value}`;
+  let queryP = document.createElement('p');
+  queryP.textContent = `Тема на справката: ${query.value}`;
   exportContent.appendChild(queryP);
 });
 
@@ -68,60 +68,64 @@ function parseBib(bibcontent) {
 
 
     })
-    //split authors
-    let normalizedAuthors = bookObject.author.replaceAll(' and ', '; ');
-    bookObject.author = normalizedAuthors;
-    console.log(normalizedAuthors)
-    bookObjects.push(bookObject)
-    console.log(bookObjects)
-   
+    //split authors IF THERE ARE ANY
+    if (bookObject.author) {
+      let normalizedAuthors = bookObject.author.replaceAll(' and ', '; ');
+      bookObject.author = normalizedAuthors;
+    } else {
+      //if there aren't authors!
+      bookObject.author='';
+    }
+
+    bookObjects.push(bookObject);
+
   });
 
   //sort books by author and then append
   var books = bookObjects.sort((a, b) => a.author.localeCompare(b.author))
- 
+
   console.log(books)
   //add date
-  let dateP=document.createElement('p');
+  let dateP = document.createElement('p');
   const date = new Date();
 
-// ✅ DD/MM/YYYY
-const result1 = new Date().toLocaleDateString('en-GB');
-console.log(result1); // 👉️ 24/07/2023
-dateP.textContent=`Дата: ${result1}`
-exportContent.appendChild(dateP);
+  // ✅ DD/MM/YYYY
+  const result1 = new Date().toLocaleDateString('en-GB');
+  console.log(result1); // 👉️ 24/07/2023
+  dateP.textContent = `Дата: ${result1}`
+  exportContent.appendChild(dateP);
 
 
   //add number of resources
-  let resourcesP=document.createElement('p');
-  resourcesP.textContent=`Брой източници: ${books.length}`;
+  let resourcesP = document.createElement('p');
+  resourcesP.textContent = `Брой източници: ${books.length}`;
   exportContent.appendChild(resourcesP);
 
-  books.forEach(bookObject=>{
-   //create isbd div and ps
-   let bookDiv = document.createElement('div');
-   bookDiv.classList.add("containerDiv");
+  books.forEach(bookObject => {
+    //create isbd div and ps
+    let bookDiv = document.createElement('div');
+    bookDiv.classList.add("containerDiv");
 
-   //getSignature
-   let signatureP = document.createElement('p');
-   signatureP.textContent = bookObject.signature;
+    //getSignature
+    let signatureP = document.createElement('p');
+    signatureP.textContent = bookObject.signature;
 
 
-   let isbdP = document.createElement("p");
-   isbdP.classList.add('mainContent')
-   let isbdString = `${bookObject.title}/ ${bookObject.author}. - ${bookObject.address}: ${bookObject.publisher}
+    let isbdP = document.createElement("p");
+    isbdP.classList.add('mainContent')
+    let isbdString = `${bookObject.title}/ ${bookObject.author}. - ${bookObject.address}: ${bookObject.publisher}
    , ${bookObject.year}. - ${bookObject.pages}`;
-   isbdP.textContent = isbdString;
+    isbdP.textContent = isbdString;
 
-   let note = document.createElement('p');
-   note.classList.add('smaller');
-   note.textContent = bookObject.note;
+    let note = document.createElement('p');
+    note.classList.add('smaller');
+    note.textContent = bookObject.note;
 
-   //append to div
-   bookDiv.appendChild(signatureP);
-   bookDiv.appendChild(isbdP);
-   bookDiv.appendChild(note);
-   exportContent.appendChild(bookDiv);
+    //append to div
+    bookDiv.appendChild(signatureP);
+    bookDiv.appendChild(isbdP);
+    bookDiv.appendChild(note);
+    exportContent.appendChild(bookDiv);
   })
 }
 
