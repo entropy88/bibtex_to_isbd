@@ -1,0 +1,15 @@
+.smaller{
+   margin-top: 12px;
+    background-color: red;
+}
+
+.mainContent{
+    margin-top: 12px;
+    background-color: aqua;
+}
+
+.containerDiv{
+    margin-top: 24px;
+    margin-bottom: 24px;
+    background-color: green;
+}
