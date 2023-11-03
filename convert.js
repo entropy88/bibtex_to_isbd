@@ -106,25 +106,46 @@ function parseBib(bibcontent) {
     let bookDiv = document.createElement('div');
     bookDiv.classList.add("containerDiv");
 
-    //getSignature
-    let signatureP = document.createElement('p');
-    signatureP.textContent = bookObject.signature;
-
+   
 
     let isbdP = document.createElement("p");
-    isbdP.classList.add('mainContent')
-    let isbdString = `${bookObject.title}/ ${bookObject.author}. - ${bookObject.address}: ${bookObject.publisher}
+    isbdP.classList.add('mainContent');
+
+    let isbdString="default"
+
+    //case analytiical
+    if (bookObject.hasOwnProperty('journal')){
+      console.log('is analytical')
+      isbdString=`${bookObject.title}/ ${bookObject.author}. - В: ${bookObject.journal}. - ${bookObject.number}, (${bookObject.year}), с. ${bookObject.pages}`;
+
+    } else{
+
+    isbdString = `${bookObject.title}/ ${bookObject.author}. - ${bookObject.address}: ${bookObject.publisher}
    , ${bookObject.year}. - ${bookObject.pages}`;
+   
+    }
+
     isbdP.textContent = isbdString;
 
-    let note = document.createElement('p');
-    note.classList.add('smaller');
-    note.textContent = bookObject.note;
-
     //append to div
+    if (bookObject.hasOwnProperty('signature')){
+       //getSignature
+    let signatureP = document.createElement('p');
+    signatureP.textContent = bookObject.signature; 
     bookDiv.appendChild(signatureP);
+    }
+   
     bookDiv.appendChild(isbdP);
-    bookDiv.appendChild(note);
+    console.log('append isbd?')
+
+    if (bookObject.hasOwnProperty('note')){
+      let note = document.createElement('p');
+      note.classList.add('smaller');
+      note.textContent = bookObject.note; 
+      bookDiv.appendChild(note);
+      }
+  
+   
     exportContent.appendChild(bookDiv);
   })
 }
