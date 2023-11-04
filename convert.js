@@ -1,4 +1,3 @@
-
 /*This creates a global variable with the HTML element input in it. */
 var input = document.getElementById("myFile");
 /*This creates a global variable with the HTML element div with id output in it. */
@@ -74,15 +73,18 @@ function parseBib(bibcontent) {
       bookObject.author = normalizedAuthors;
     } else {
       //if there aren't authors!
-      bookObject.author='';
+      bookObject.author = '';
     }
+
+    //assign type,default is book
+    bookObject.type = 'book';
 
     bookObjects.push(bookObject);
 
   });
 
-  //sort books by author and then append
-  var books = bookObjects.sort((a, b) => a.author.localeCompare(b.author))
+  //sort books by main entry and then append
+  var books = bookObjects.sort((a, b) => a.main.localeCompare(b.main))
 
   console.log(books)
   //add date
@@ -101,55 +103,92 @@ function parseBib(bibcontent) {
   resourcesP.textContent = `Брой източници: ${books.length}`;
   exportContent.appendChild(resourcesP);
 
+  //create separate arrays for books and articles
+  let bookRecords = [];
+  let articleRecords = [];
+
   books.forEach(bookObject => {
-    //create isbd div and ps
-    let bookDiv = document.createElement('div');
-    bookDiv.classList.add("containerDiv");
-
-   
-
-    let isbdP = document.createElement("p");
-    isbdP.classList.add('mainContent');
-
-    let isbdString="default"
-
-    //case analytiical
-    if (bookObject.hasOwnProperty('journal')){
-      console.log('is analytical')
-      isbdString=`${bookObject.title}/ ${bookObject.author}. - В: ${bookObject.journal}. - ${bookObject.number}, (${bookObject.year}), с. ${bookObject.pages}`;
-
-    } else{
-
-    isbdString = `${bookObject.title}/ ${bookObject.author}. - ${bookObject.address}: ${bookObject.publisher}
-   , ${bookObject.year}. - ${bookObject.pages}`;
-   
-    }
-
-    isbdP.textContent = isbdString;
-
-    //append to div
-    if (bookObject.hasOwnProperty('signature')){
-       //getSignature
-    let signatureP = document.createElement('p');
-    signatureP.textContent = bookObject.signature; 
-    bookDiv.appendChild(signatureP);
-    }
-   
-    bookDiv.appendChild(isbdP);
-    console.log('append isbd?')
-
-    if (bookObject.hasOwnProperty('note')){
-      let note = document.createElement('p');
-      note.classList.add('smaller');
-      note.textContent = bookObject.note; 
-      bookDiv.appendChild(note);
-      }
   
-   
-    exportContent.appendChild(bookDiv);
+    let isbdString = "default";
+
+    //define type og record
+
+    if (bookObject.hasOwnProperty('journal')) {
+      bookObject.type = "analytical";
+      articleRecords.push(bookObject);
+
+    } else {
+      bookRecords.push(bookObject);
+    }
+    console.log(bookRecords.length);
+    console.log(articleRecords.length);
   })
+
+
+  //visualise articles
+  let articlesDiv = document.createElement('div');
+  let articlesLabel = document.createElement('p');
+  articlesLabel.textContent = `Статии: ${articleRecords.length}`;
+  articlesDiv.appendChild(articlesLabel);
+  articleRecords.forEach(r => {
+    let articleContainer = document.createElement('div');
+    //main entry
+    appendMainEntry(articleContainer, r)
+    isbdString = `${r.title}/ ${r.author}. - В: ${r.journal}. - ${r.number}, (${r.year}), с. ${r.pages}`;
+    let articleP = document.createElement('p');
+    articleP.textContent = isbdString;
+    articleContainer.appendChild(articleP)
+    articlesDiv.appendChild(articleContainer);
+  })
+
+
+  //visualise books
+  let booksDiv = document.createElement('div');
+  let booksLabel = document.createElement('p');
+  booksLabel.textContent = `Книги: ${bookRecords.length}`;
+  booksDiv.appendChild(booksLabel);
+  bookRecords.forEach(r => {
+    let bookContainer = document.createElement('div');
+    //signature
+    if (r.hasOwnProperty('signature')) {
+      //getSignature
+      let signatureP = document.createElement('p');
+      signatureP.textContent = r.signature;
+      bookContainer.appendChild(signatureP);
+    }
+    //main entry
+    appendMainEntry(bookContainer, r)
+    isbdString = `${r.title}/ ${r.author}. - ${r.address}: ${r.publisher}
+    , ${r.year}. - ${r.pages}`;
+    let bookP = document.createElement('p');
+    bookP.textContent = isbdString;
+    bookContainer.appendChild(bookP);
+    //note
+    appendNote(bookContainer, r)
+
+    booksDiv.appendChild(bookContainer);
+  })
+
+  exportContent.appendChild(booksDiv)
+  exportContent.appendChild(articlesDiv);
 }
 
+function appendNote(container, recordObject) {
+  if (recordObject.hasOwnProperty('note')) {
+    console.log('hasNote');
+    let noteP = document.createElement('p');
+    noteP.classList.add('smaller');
+    noteP.textContent = recordObject.note;
+    container.appendChild(noteP)
+  }
+}
+
+function appendMainEntry(container, recordObject) {
+  let mainEntryP = document.createElement('p');
+  mainEntryP.classList.add('mainEntry');
+  mainEntryP.textContent = recordObject.main;
+  container.appendChild(mainEntryP);
+}
 
 function Export2Word(element, filename = '') {
   var preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
@@ -186,4 +225,3 @@ function Export2Word(element, filename = '') {
 
   document.body.removeChild(downloadLink);
 }
-

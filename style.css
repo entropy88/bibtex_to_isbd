@@ -1,6 +1,10 @@
 .smaller{
    margin-top: -8px;
     background-color: red;
+    font-size: small;
+}
+.mainEntry{
+   font-weight: bold;
 }
 
 .mainContent{
