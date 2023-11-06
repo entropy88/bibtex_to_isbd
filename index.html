@@ -7,13 +7,17 @@
     <title>Document</title>
 </head>
 <body>
-    <input type ="file" id="myFile">   
+    <div id="inter" class="inter">
     <input id="query" placeholder="Тема на справката">
-   
-    <div id="exportContent">
+    <input id="user" placeholder="Служител">
+   <input type ="file" id="myFile">   
+    <button id="exportBtn" onclick="Export2Word('exportContent');">Export as .doc</button>
+</div>
+
+    <div id="exportContent" class="exportContainer">
         <!-- Your content here -->
     </div>
-    <button onclick="Export2Word('exportContent');">Export as .doc</button>
+   
   
 </body>
 <script src="convert.js"></script>

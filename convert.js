@@ -6,7 +6,13 @@ var output = document.getElementById("output");
 The first will get where you put your file, in this case it's the input element.
 The second will get the div which content will be replaced by the content of your txt file. */
 let exportContent = document.getElementById("exportContent");
+
+let exportBtn=document.getElementById('exportBtn');
+//starts disabled, gets enabled once content is parsed
+exportBtn.disabled=true;
+
 let query = document.getElementById('query');
+let user = document.getElementById('user');
 
 /* Here we tell to our input element to do something special when his value changes.
 A change will occur for example when a user will chose a file.*/
@@ -28,10 +34,8 @@ input.addEventListener("change", function () {
     /* This is where we tell the FileReader to open and get the content of the file. This will fire the load event and get the function above to execute its code. */
     reader.readAsText(myFile);
   }
-  //add query
-  let queryP = document.createElement('p');
-  queryP.textContent = `Тема на справката: ${query.value}`;
-  exportContent.appendChild(queryP);
+ 
+
 });
 
 //parse the bibtex
@@ -84,30 +88,22 @@ function parseBib(bibcontent) {
   });
 
   //sort books by main entry and then append
-  var books = bookObjects.sort((a, b) => a.main.localeCompare(b.main))
+  let records = bookObjects.sort((a, b) => a.main.localeCompare(b.main))
 
-  console.log(books)
-  //add date
-  let dateP = document.createElement('p');
-  const date = new Date();
+  //enable exportBtn
+  exportBtn.disabled=false;
 
-  // ✅ DD/MM/YYYY
-  const result1 = new Date().toLocaleDateString('en-GB');
-  console.log(result1); // 👉️ 24/07/2023
-  dateP.textContent = `Дата: ${result1}`
-  exportContent.appendChild(dateP);
+  console.log(records)
 
 
-  //add number of resources
-  let resourcesP = document.createElement('p');
-  resourcesP.textContent = `Брой източници: ${books.length}`;
-  exportContent.appendChild(resourcesP);
+
+
 
   //create separate arrays for books and articles
   let bookRecords = [];
   let articleRecords = [];
 
-  books.forEach(bookObject => {
+  records.forEach(bookObject => {
   
     let isbdString = "default";
 
@@ -125,10 +121,13 @@ function parseBib(bibcontent) {
   })
 
 
+ 
+
   //visualise articles
   let articlesDiv = document.createElement('div');
   let articlesLabel = document.createElement('p');
   articlesLabel.textContent = `Статии: ${articleRecords.length}`;
+  articlesLabel.classList.add('bolded')
   articlesDiv.appendChild(articlesLabel);
   articleRecords.forEach(r => {
     let articleContainer = document.createElement('div');
@@ -146,6 +145,7 @@ function parseBib(bibcontent) {
   let booksDiv = document.createElement('div');
   let booksLabel = document.createElement('p');
   booksLabel.textContent = `Книги: ${bookRecords.length}`;
+  booksLabel.classList.add('bolded');
   booksDiv.appendChild(booksLabel);
   bookRecords.forEach(r => {
     let bookContainer = document.createElement('div');
@@ -158,8 +158,7 @@ function parseBib(bibcontent) {
     }
     //main entry
     appendMainEntry(bookContainer, r)
-    isbdString = `${r.title}/ ${r.author}. - ${r.address}: ${r.publisher}
-    , ${r.year}. - ${r.pages}`;
+    isbdString = `${r.title}/ ${r.author}. - ${r.address}: ${r.publisher}, ${r.year}. - ${r.pages}`;
     let bookP = document.createElement('p');
     bookP.textContent = isbdString;
     bookContainer.appendChild(bookP);
@@ -169,6 +168,35 @@ function parseBib(bibcontent) {
     booksDiv.appendChild(bookContainer);
   })
 
+  //clean the container
+  exportContent.innerHTML='';
+   //add query
+   let queryP = document.createElement('p');
+   queryP.textContent = `Тема на справката: ${query.value}`;
+   exportContent.appendChild(queryP);
+
+         //add number of resources
+         let resourcesP = document.createElement('p');
+         resourcesP.textContent = `Брой източници: ${records.length}\n Книги:${bookRecords.length}; Статии: ${articleRecords.length}`;
+         exportContent.appendChild(resourcesP);
+
+   //add date
+     //add date
+  let dateP = document.createElement('p');
+  const date = new Date();
+
+  // ✅ DD/MM/YYYY
+  const result1 = new Date().toLocaleDateString('en-GB');
+  console.log(result1); // 👉️ 24/07/2023
+  dateP.textContent = `Дата: ${result1}`
+  exportContent.appendChild(dateP);
+
+
+
+   //add user
+   let userP= document.createElement('p');
+   userP.textContent=`Изготвил: ${user.value}`;
+   exportContent.appendChild(userP)
   exportContent.appendChild(booksDiv)
   exportContent.appendChild(articlesDiv);
 }
