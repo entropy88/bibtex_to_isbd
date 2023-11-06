@@ -13,6 +13,11 @@ body {
     align-items: center;
     justify-content: center;
 }
+.bases{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 .exportContainer{
     padding: 10%;

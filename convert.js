@@ -14,6 +14,19 @@ exportBtn.disabled=true;
 let query = document.getElementById('query');
 let user = document.getElementById('user');
 
+//bases checkboxes
+{/* <input type="checkbox" id="catalogue">Каталог на НБИВ
+<input type="checkbox" id="cobiss">cobiss
+<input type="checkbox" id="ebsco"> ebsco
+<input type="checkbox" id="leninka">Cyberleninka */}
+{/* <input type="checkbox" id="scholar"> Google Scholar */}
+let catalogue=document.getElementById('catalogue');
+let cobiss=document.getElementById('cobiss');
+let ebsco=document.getElementById('ebsco');
+let scholar=document.getElementById('scholar');
+let leninka=document.getElementById('leninka');
+
+
 /* Here we tell to our input element to do something special when his value changes.
 A change will occur for example when a user will chose a file.*/
 input.addEventListener("change", function () {
@@ -197,8 +210,41 @@ function parseBib(bibcontent) {
    let userP= document.createElement('p');
    userP.textContent=`Изготвил: ${user.value}`;
    exportContent.appendChild(userP)
+
+   //append content
   exportContent.appendChild(booksDiv)
   exportContent.appendChild(articlesDiv);
+
+  //add bases
+  let bases=[];
+  if (catalogue.checked){
+    bases.push('Каталог');
+  }
+  if (cobiss.checked){
+    bases.push('COBISS')
+  }
+  if (ebsco.checked){
+    bases.push('EBSCO')
+  }
+  if (scholar.checked){
+    bases.push('Google Наука')
+  } 
+  if (leninka.checked){
+    bases.push('Cyberleninka')
+  }
+  //append only if bases are checked
+  if (bases.length>0){
+    let basesLabel=document.createElement('p');
+    basesLabel.textContent='Използвани бази:'
+    basesLabel.classList.add('bolded')
+    exportContent.appendChild(basesLabel);
+    bases.forEach(b=>{
+      let baseP=document.createElement('p');
+      baseP.textContent=b;
+      exportContent.appendChild(baseP);
+
+    })
+  }
 }
 
 function appendNote(container, recordObject) {
