@@ -7,6 +7,10 @@ The first will get where you put your file, in this case it's the input element.
 The second will get the div which content will be replaced by the content of your txt file. */
 let exportContent = document.getElementById("exportContent");
 
+let parseBtn=document.getElementById('parseBtn');
+//enable once bibtex is read
+parseBtn.disabled=true;
+
 let exportBtn=document.getElementById('exportBtn');
 //starts disabled, gets enabled once content is parsed
 exportBtn.disabled=true;
@@ -42,7 +46,12 @@ input.addEventListener("change", function () {
     reader.addEventListener("load", function (e) {
       /* What we do here is take the result of the fileReader and put it inside our output div to display it to the users. This is where you could do your scrambling and maybe save the result in a variable ? */
       //   output.textContent = e.target.result;
-      parseBib(e.target.result);
+      parseBtn.disabled=false;
+      //attach event listener here?
+      parseBtn.addEventListener('click', function(){
+        parseBib(e.target.result); 
+      })
+     
     });
     /* This is where we tell the FileReader to open and get the content of the file. This will fire the load event and get the function above to execute its code. */
     reader.readAsText(myFile);
