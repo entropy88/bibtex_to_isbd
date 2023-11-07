@@ -7,13 +7,13 @@ The first will get where you put your file, in this case it's the input element.
 The second will get the div which content will be replaced by the content of your txt file. */
 let exportContent = document.getElementById("exportContent");
 
-let parseBtn=document.getElementById('parseBtn');
+let parseBtn = document.getElementById('parseBtn');
 //enable once bibtex is read
-parseBtn.disabled=true;
+parseBtn.disabled = true;
 
-let exportBtn=document.getElementById('exportBtn');
+let exportBtn = document.getElementById('exportBtn');
 //starts disabled, gets enabled once content is parsed
-exportBtn.disabled=true;
+exportBtn.disabled = true;
 
 let query = document.getElementById('query');
 let user = document.getElementById('user');
@@ -23,12 +23,14 @@ let user = document.getElementById('user');
 <input type="checkbox" id="cobiss">cobiss
 <input type="checkbox" id="ebsco"> ebsco
 <input type="checkbox" id="leninka">Cyberleninka */}
-{/* <input type="checkbox" id="scholar"> Google Scholar */}
-let catalogue=document.getElementById('catalogue');
-let cobiss=document.getElementById('cobiss');
-let ebsco=document.getElementById('ebsco');
-let scholar=document.getElementById('scholar');
-let leninka=document.getElementById('leninka');
+{/* <input type="checkbox" id="scholar"> Google Scholar */ }
+let catalogue = document.getElementById('catalogue');
+//catalogue is checked by default
+catalogue.checked = true;
+let cobiss = document.getElementById('cobiss');
+let ebsco = document.getElementById('ebsco');
+let scholar = document.getElementById('scholar');
+let leninka = document.getElementById('leninka');
 
 
 /* Here we tell to our input element to do something special when his value changes.
@@ -46,24 +48,24 @@ input.addEventListener("change", function () {
     reader.addEventListener("load", function (e) {
       /* What we do here is take the result of the fileReader and put it inside our output div to display it to the users. This is where you could do your scrambling and maybe save the result in a variable ? */
       //   output.textContent = e.target.result;
-      parseBtn.disabled=false;
+      parseBtn.disabled = false;
       //attach event listener here?
-      parseBtn.addEventListener('click', function(){
-        parseBib(e.target.result); 
+      parseBtn.addEventListener('click', function () {
+        parseBib(e.target.result);
       })
-     
+
     });
     /* This is where we tell the FileReader to open and get the content of the file. This will fire the load event and get the function above to execute its code. */
     reader.readAsText(myFile);
   }
- 
+
 
 });
 
 //parse the bibtex
 function parseBib(bibcontent) {
   //create empty array
-  let bookObjects = [];
+  let bibtexRecords = [];
 
   let recordsArray = bibcontent.split("@book");
   recordsArray.shift()
@@ -71,79 +73,64 @@ function parseBib(bibcontent) {
 
   recordsArray.forEach(record => {
     //create object
-    let bookObject = {}
+    let bibtexRecord = {}
 
     let elements = record.match(/[\w]* = {([\s\S]*?)}/gm);
-    console.log(elements);
-    elements.forEach(e => {
+      elements.forEach(e => {
 
+      //split to key-value
       let meta = e.match(/[\w]* = /gm);
-      console.log(meta);
       let metaString = meta[0];
       metaString = metaString.substring(0, metaString.length - 3)
-      console.log(metaString);
-
+   
       let content = e.match(/= {(.*?)\}/gm);
       let contentString = content[0];
-      console.log(contentString)
       contentString = contentString.substring(3, contentString.length - 1)
-      console.log(contentString);
-
-      bookObject[metaString] = contentString;
+    
+      bibtexRecord[metaString] = contentString;
 
 
     })
     //split authors IF THERE ARE ANY
-    if (bookObject.author) {
-      let normalizedAuthors = bookObject.author.replaceAll(' and ', '; ');
-      bookObject.author = normalizedAuthors;
+    if (bibtexRecord.author) {
+      let normalizedAuthors = bibtexRecord.author.replaceAll(' and ', '; ');
+      bibtexRecord.author = normalizedAuthors;
     } else {
       //if there aren't authors!
-      bookObject.author = '';
+      bibtexRecord.author = '';
     }
 
     //assign type,default is book
-    bookObject.type = 'book';
+    bibtexRecord.type = 'book';
 
-    bookObjects.push(bookObject);
+    bibtexRecords.push(bibtexRecord);
 
   });
 
   //sort books by main entry and then append
-  let records = bookObjects.sort((a, b) => a.main.localeCompare(b.main))
+  let records = bibtexRecords.sort((a, b) => a.main.localeCompare(b.main))
 
   //enable exportBtn
-  exportBtn.disabled=false;
-
-  console.log(records)
-
-
-
-
+  exportBtn.disabled = false;
 
   //create separate arrays for books and articles
   let bookRecords = [];
   let articleRecords = [];
 
-  records.forEach(bookObject => {
-  
+  records.forEach(bibtexRecord => {
+
     let isbdString = "default";
 
     //define type og record
 
-    if (bookObject.hasOwnProperty('journal')) {
-      bookObject.type = "analytical";
-      articleRecords.push(bookObject);
+    if (bibtexRecord.hasOwnProperty('journal')) {
+      bibtexRecord.type = "analytical";
+      articleRecords.push(bibtexRecord);
 
     } else {
-      bookRecords.push(bookObject);
+      bookRecords.push(bibtexRecord);
     }
-    console.log(bookRecords.length);
-    console.log(articleRecords.length);
   })
-
-
- 
 
   //visualise articles
   let articlesDiv = document.createElement('div');
@@ -161,7 +148,6 @@ function parseBib(bibcontent) {
     articleContainer.appendChild(articleP)
     articlesDiv.appendChild(articleContainer);
   })
-
 
   //visualise books
   let booksDiv = document.createElement('div');
@@ -191,19 +177,18 @@ function parseBib(bibcontent) {
   })
 
   //clean the container
-  exportContent.innerHTML='';
-   //add query
-   let queryP = document.createElement('p');
-   queryP.textContent = `Тема на справката: ${query.value}`;
-   exportContent.appendChild(queryP);
+  exportContent.innerHTML = '';
+  //add query
+  let queryP = document.createElement('p');
+  queryP.textContent = `Тема на справката: ${query.value}`;
+  exportContent.appendChild(queryP);
 
-         //add number of resources
-         let resourcesP = document.createElement('p');
-         resourcesP.textContent = `Брой източници: ${records.length}\n Книги:${bookRecords.length}; Статии: ${articleRecords.length}`;
-         exportContent.appendChild(resourcesP);
+  //add number of resources
+  let resourcesP = document.createElement('p');
+  resourcesP.textContent = `Брой източници: ${records.length}\n Книги:${bookRecords.length}; Статии: ${articleRecords.length}`;
+  exportContent.appendChild(resourcesP);
 
    //add date
-     //add date
   let dateP = document.createElement('p');
   const date = new Date();
 
@@ -213,43 +198,41 @@ function parseBib(bibcontent) {
   dateP.textContent = `Дата: ${result1}`
   exportContent.appendChild(dateP);
 
+  //add user
+  let userP = document.createElement('p');
+  userP.textContent = `Изготвил: ${user.value}`;
+  exportContent.appendChild(userP)
 
-
-   //add user
-   let userP= document.createElement('p');
-   userP.textContent=`Изготвил: ${user.value}`;
-   exportContent.appendChild(userP)
-
-   //append content
+  //append content
   exportContent.appendChild(booksDiv)
   exportContent.appendChild(articlesDiv);
 
   //add bases
-  let bases=[];
-  if (catalogue.checked){
+  let bases = [];
+  if (catalogue.checked) {
     bases.push('Каталог');
   }
-  if (cobiss.checked){
+  if (cobiss.checked) {
     bases.push('COBISS')
   }
-  if (ebsco.checked){
+  if (ebsco.checked) {
     bases.push('EBSCO')
   }
-  if (scholar.checked){
+  if (scholar.checked) {
     bases.push('Google Наука')
-  } 
-  if (leninka.checked){
+  }
+  if (leninka.checked) {
     bases.push('Cyberleninka')
   }
   //append only if bases are checked
-  if (bases.length>0){
-    let basesLabel=document.createElement('p');
-    basesLabel.textContent='Използвани бази:'
+  if (bases.length > 0) {
+    let basesLabel = document.createElement('p');
+    basesLabel.textContent = 'Използвани бази:'
     basesLabel.classList.add('bolded')
     exportContent.appendChild(basesLabel);
-    bases.forEach(b=>{
-      let baseP=document.createElement('p');
-      baseP.textContent=b;
+    bases.forEach(b => {
+      let baseP = document.createElement('p');
+      baseP.textContent = b;
       exportContent.appendChild(baseP);
 
     })
