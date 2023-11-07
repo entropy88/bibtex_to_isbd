@@ -136,12 +136,12 @@ function parseBib(bibcontent) {
   let articlesDiv = document.createElement('div');
   let articlesLabel = document.createElement('p');
   articlesLabel.textContent = `Статии: ${articleRecords.length}`;
-  articlesLabel.classList.add('bolded')
+  articlesLabel.style.fontWeight='bold';
   articlesDiv.appendChild(articlesLabel);
   articleRecords.forEach(r => {
     let articleContainer = document.createElement('div');
     //main entry
-    appendMainEntry(articleContainer, r)
+    appendSortWord(articleContainer, r)
     isbdString = `${r.title}/ ${r.author}. - В: ${r.journal}. - ${r.number}, (${r.year}), с. ${r.pages}`;
     let articleP = document.createElement('p');
     articleP.textContent = isbdString;
@@ -153,7 +153,7 @@ function parseBib(bibcontent) {
   let booksDiv = document.createElement('div');
   let booksLabel = document.createElement('p');
   booksLabel.textContent = `Книги: ${bookRecords.length}`;
-  booksLabel.classList.add('bolded');
+  booksLabel.style.fontWeight='bold';
   booksDiv.appendChild(booksLabel);
   bookRecords.forEach(r => {
     let bookContainer = document.createElement('div');
@@ -164,8 +164,8 @@ function parseBib(bibcontent) {
       signatureP.textContent = r.signature;
       bookContainer.appendChild(signatureP);
     }
-    //main entry
-    appendMainEntry(bookContainer, r)
+    //sort word
+    appendSortWord(bookContainer, r)
     isbdString = `${r.title}/ ${r.author}. - ${r.address}: ${r.publisher}, ${r.year}. - ${r.pages}`;
     let bookP = document.createElement('p');
     bookP.textContent = isbdString;
@@ -196,6 +196,8 @@ function parseBib(bibcontent) {
   const result1 = new Date().toLocaleDateString('en-GB');
   console.log(result1); // 👉️ 24/07/2023
   dateP.textContent = `Дата: ${result1}`
+  //try to keep formatting in exporting
+  dateP.style.fontWeight='bold';
   exportContent.appendChild(dateP);
 
   //add user
@@ -228,7 +230,7 @@ function parseBib(bibcontent) {
   if (bases.length > 0) {
     let basesLabel = document.createElement('p');
     basesLabel.textContent = 'Използвани бази:'
-    basesLabel.classList.add('bolded')
+    basesLabel.style.fontWeight='bold';
     exportContent.appendChild(basesLabel);
     bases.forEach(b => {
       let baseP = document.createElement('p');
@@ -249,11 +251,13 @@ function appendNote(container, recordObject) {
   }
 }
 
-function appendMainEntry(container, recordObject) {
-  let mainEntryP = document.createElement('p');
-  mainEntryP.classList.add('mainEntry');
-  mainEntryP.textContent = recordObject.main;
-  container.appendChild(mainEntryP);
+function appendSortWord(container, recordObject) {
+  let sortWordP = document.createElement('p');
+  sortWordP.style.marginBottom='-12px'
+  // mainEntryP.classList.add('mainEntry');
+
+  sortWordP.textContent = recordObject.main;
+  container.appendChild(sortWordP);
 }
 
 function Export2Word(element, filename = '') {
