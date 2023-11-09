@@ -9,6 +9,21 @@ body {
     font-family: Garamond, sans-serif;
     font-size: larger;
 }
+input{
+    padding: 8px;
+}
+
+input::file-selector-button {
+   
+    background-color: #86b9b0;
+    color: #042630;
+    font-family: Garamond, sans-serif;
+    font-size: large;
+    padding: 8px;
+    border-color: #d0d6d6;
+    border-style: double;
+    margin: 8px;
+  }
 button{
     background-color: #86b9b0;
     color: #042630;
